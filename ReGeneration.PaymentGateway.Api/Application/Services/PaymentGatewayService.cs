@@ -81,6 +81,32 @@ namespace ReGeneration.PaymentGateway.Api.Application.Services
 		}
 
 		/// <summary>
+		/// Deletes a specific payment.
+		/// </summary>
+		/// <param name="paymentId"></param>
+		/// <param name="cancellationToken"></param>
+		/// <returns></returns>
+		/// <exception cref="NotImplementedException"></exception>
+		public async Task<bool> DeletePaymentAsync(Guid paymentId, CancellationToken cancellationToken)
+		{
+			var payment = await _applicationDbContext
+				.Payments
+				.AsNoTracking()
+				.SingleOrDefaultAsync(p => p.Id == paymentId, cancellationToken);
+
+			if (payment == null)
+			{
+				throw new NotFoundException(nameof(Payment), paymentId);
+			}
+
+			_applicationDbContext.Payments.Remove(payment);
+
+			await _applicationDbContext.SaveChangesAsync(cancellationToken);
+
+			return true;
+		}
+
+		/// <summary>
 		/// Get specific payment from db
 		/// </summary>
 		/// <param name="paymentId"></param>

@@ -8,5 +8,6 @@ namespace ReGeneration.PaymentGateway.Api.Application.Common.Interfaces
 	{
 		Task<Result<PaymentDto>> CreatePaymentAsync(CreatePaymentOptions createPaymentOptions, CancellationToken cancellationToken);
 		Task<Result<PaymentDto>> GetPaymentAsync(Guid paymentId, CancellationToken cancellationToken);
+		Task<bool> DeletePaymentAsync(Guid paymentId, CancellationToken cancellationToken);
 	}
 }
