@@ -28,7 +28,10 @@ namespace ReGeneration.PaymentGateway.Api.Setup
 				context.Database.Migrate();
 			}
 
-			await ApplicationDbContextSeed.SeedSampleDataAsync(context);
+			if (app.Environment.IsDevelopment())
+			{
+				await ApplicationDbContextSeed.SeedSampleDataAsync(context);
+			}
 		}
 	}
 }
