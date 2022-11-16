@@ -9,20 +9,16 @@ namespace ReGeneration.PaymentGateway.Api.Controllers
 	/// <summary>
 	/// The controller responsible for Payments resource
 	/// </summary>
-	[Produces("application/json")]
-	[ApiController]
 	[Route("api/payments")]
-	public class PaymentsController : ControllerBase
+	public class PaymentsController : ApiControllerBase
 	{
-		private readonly IPaymentGatewayService _paymentGatewayService;
-
 		/// <summary>
 		/// The PaymentsController constructor
 		/// </summary>
-		/// <param name="paymentGatewayService"></param>
+		/// <param name="mediator"></param>
 		public PaymentsController(IPaymentGatewayService paymentGatewayService)
+			: base(paymentGatewayService)
 		{
-			_paymentGatewayService = paymentGatewayService;
 		}
 
 		/// <summary>
@@ -30,7 +26,7 @@ namespace ReGeneration.PaymentGateway.Api.Controllers
 		/// </summary>
 		/// <param name="request"></param>
 		/// <param name="cancellationToken"></param>
-		/// <returns>An ActionResult of CreatePaymentResponse</returns>
+		/// <returns>An ActionResult of PaymentIncludingCardResponse</returns>
 		/// <response code="201">Returns the created payment id</response>
 		/// <response code="400">Returns 400 if the provided payment request details were invalid</response>
 		/// <response code="500">Returns 500 if error has occured on the API side</response>
@@ -39,11 +35,11 @@ namespace ReGeneration.PaymentGateway.Api.Controllers
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 		[HttpPost]
-		public async Task<ActionResult<PaymentResponse>> Create(CreatePaymentRequest request, CancellationToken cancellationToken)
+		public async Task<ActionResult<PaymentWithCardResponse>> Create(CreatePaymentRequest request, CancellationToken cancellationToken)
 		{
-			var newPaymentResult = await _paymentGatewayService.CreatePaymentAsync(request.ToCreatePaymentOptions(), cancellationToken);
+			var newPaymentResult = await PaymentGatewayService.CreatePaymentAsync(request.ToCreatePaymentOptions(), cancellationToken);
 
-			return CreatedAtRoute("GetPaymentById", new { id = newPaymentResult.Data.Id }, newPaymentResult.Data.ToPaymentResponse());
+			return CreatedAtRoute("GetPaymentById", new { id = newPaymentResult.Data.Id }, newPaymentResult.Data.ToPaymentIncludingCardResponse());
 		}
 
 		/// <summary>
@@ -61,7 +57,7 @@ namespace ReGeneration.PaymentGateway.Api.Controllers
 		[HttpDelete("{id}", Name = "DeletePaymentById")]
 		public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
 		{
-			await _paymentGatewayService.DeletePaymentAsync(id, cancellationToken);
+			await PaymentGatewayService.DeletePaymentAsync(id, cancellationToken);
 
 			return NoContent();
 		}
@@ -71,7 +67,7 @@ namespace ReGeneration.PaymentGateway.Api.Controllers
 		/// </summary>
 		/// <param name="id"></param>
 		/// <param name="cancellationToken"></param>
-		/// <returns>An ActionResult of CreatePaymentResponse</returns>
+		/// <returns>An ActionResult of PaymentIncludingCardResponse</returns>
 		/// <response code="200">Returns the requested payment</response>
 		/// <response code="404">Returns 404 if the payment was not found</response>
 		/// <response code="500">Returns 500 if error has occured on the API side</response>
@@ -79,11 +75,11 @@ namespace ReGeneration.PaymentGateway.Api.Controllers
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 		[HttpGet("{id}", Name = "GetPaymentById")]
-		public async Task<ActionResult<PaymentResponse>> Get(Guid id, CancellationToken cancellationToken)
+		public async Task<ActionResult<PaymentWithCardResponse>> Get(Guid id, CancellationToken cancellationToken)
 		{
-			var payment = await _paymentGatewayService.GetPaymentAsync(id, cancellationToken);
+			var payment = await PaymentGatewayService.GetPaymentAsync(id, cancellationToken);
 
-			return Ok(payment.Data.ToPaymentResponse());
+			return Ok(payment.Data.ToPaymentIncludingCardResponse());
 		}
 	}
 }

@@ -38,9 +38,9 @@ namespace ReGeneration.PaymentGateway.Api.Application.Services
 		/// </summary>
 		/// <param name="createPaymentOptions"></param>
 		/// <param name="cancellationToken"></param>
-		/// <returns>A Task of type Result<PaymentDto></returns>
+		/// <returns>A Task of type Result<PaymentIncludingCardDto></returns>
 		/// <exception cref="ValidationException"></exception>
-		public async Task<Result<PaymentDto>> CreatePaymentAsync(CreatePaymentOptions createPaymentOptions, CancellationToken cancellationToken)
+		public async Task<Result<PaymentWithCardDto>> CreatePaymentAsync(CreatePaymentOptions createPaymentOptions, CancellationToken cancellationToken)
 		{
 			// TODO - Validate amount, currency, source, etc...
 			var isCardValid = _cardValidationService.ValidateCardDetails(createPaymentOptions.Source.Number, createPaymentOptions.Source.CVV);
@@ -74,9 +74,9 @@ namespace ReGeneration.PaymentGateway.Api.Application.Services
 
 			await _applicationDbContext.SaveChangesAsync(cancellationToken);
 
-			return new Result<PaymentDto>
+			return new Result<PaymentWithCardDto>
 			{
-				Data = payment.ToPaymentDto()
+				Data = payment.ToPaymentIncludingCardDto()
 			};
 		}
 
@@ -113,7 +113,7 @@ namespace ReGeneration.PaymentGateway.Api.Application.Services
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
 		/// <exception cref="NotFoundException"></exception>
-		public async Task<Result<PaymentDto>> GetPaymentAsync(Guid paymentId, CancellationToken cancellationToken)
+		public async Task<Result<PaymentWithCardDto>> GetPaymentAsync(Guid paymentId, CancellationToken cancellationToken)
 		{
 			var payment = await _applicationDbContext
 				.Payments
@@ -126,9 +126,28 @@ namespace ReGeneration.PaymentGateway.Api.Application.Services
 				throw new NotFoundException(nameof(Payment), paymentId);
 			}
 
-			return new Result<PaymentDto>
+			return new Result<PaymentWithCardDto>
 			{
-				Data = payment.ToPaymentDto()
+				Data = payment.ToPaymentIncludingCardDto()
+			};
+		}
+
+		public async Task<Result<IList<PaymentBaseDto>>> GetPaymentsOfSpecificCard(Guid cardId, CancellationToken cancellationToken)
+		{
+			var card = await _applicationDbContext
+				.Cards
+				.AsNoTracking()
+				.Include(p => p.Payments)
+				.SingleOrDefaultAsync(p => p.Id == cardId, cancellationToken);
+
+			if (card == null)
+			{
+				throw new NotFoundException(nameof(Card), cardId);
+			}
+
+			return new Result<IList<PaymentBaseDto>>
+			{
+				Data = card.Payments.ToListOfPaymentDtos()
 			};
 		}
 

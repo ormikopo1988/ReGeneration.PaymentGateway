@@ -8,29 +8,78 @@ namespace ReGeneration.PaymentGateway.Api.Application.Payments.Extensions
 {
     public static class PaymentExtensions
     {
-        public static PaymentResponse ToPaymentResponse(this PaymentDto paymentDto)
+        public static PaymentWithCardResponse ToPaymentIncludingCardResponse(this PaymentWithCardDto paymentIncludingCardDto)
         {
-            return new PaymentResponse
+            return new PaymentWithCardResponse
             {
-                Amount = paymentDto.Amount,
-                Currency = paymentDto.Currency,
-                Id = paymentDto.Id,
-                Approved = paymentDto.Approved,
-                Status = paymentDto.Status,
+                Amount = paymentIncludingCardDto.Amount,
+                Currency = paymentIncludingCardDto.Currency,
+                Id = paymentIncludingCardDto.Id,
+                Approved = paymentIncludingCardDto.Approved,
+                Status = paymentIncludingCardDto.Status,
                 Source = new CardDetails
                 {
-                    MaskedCVV = paymentDto.Source.MaskedCVV,
-                    MaskedCardNumber = paymentDto.Source.MaskedCardNumber,
-                    ExpiryMonth = paymentDto.Source.ExpiryMonth,
-                    ExpiryYear = paymentDto.Source.ExpiryYear
+                    MaskedCVV = paymentIncludingCardDto.Source.MaskedCVV,
+                    MaskedCardNumber = paymentIncludingCardDto.Source.MaskedCardNumber,
+                    ExpiryMonth = paymentIncludingCardDto.Source.ExpiryMonth,
+                    ExpiryYear = paymentIncludingCardDto.Source.ExpiryYear
                 }
             };
         }
 
-        public static PaymentDto ToPaymentDto(this Payment payment)
+		public static IList<PaymentBaseResponse> ToListOfPaymentResponse(this IList<PaymentBaseDto> paymentDtos)
+		{
+			var result = new List<PaymentBaseResponse>();
+
+			if (paymentDtos is not null)
+			{
+				foreach (var paymentDto in paymentDtos)
+				{
+					result.Add(new PaymentBaseResponse
+					{
+						Amount = paymentDto.Amount,
+						Currency = paymentDto.Currency,
+						Id = paymentDto.Id,
+						Approved = paymentDto.Approved,
+						Status = paymentDto.Status
+					});
+				}
+			}
+
+			return result;
+		}
+
+		public static PaymentBaseDto ToPaymentDto(this Payment payment)
+		{
+			return new PaymentBaseDto
+			{
+				Amount = payment.Amount,
+				Approved = payment.Approved,
+				Currency = payment.Currency,
+				Id = payment.Id,
+				Status = payment.Status
+			};
+		}
+
+		public static IList<PaymentBaseDto> ToListOfPaymentDtos(this IList<Payment> payments)
+		{
+			var result = new List<PaymentBaseDto>();
+
+			if (payments is not null)
+			{
+				foreach (var payment in payments)
+				{
+					result.Add(payment.ToPaymentDto());
+				}
+			}
+
+			return result;
+		}
+
+		public static PaymentWithCardDto ToPaymentIncludingCardDto(this Payment payment)
         {
-            return new PaymentDto
-            {
+            return new PaymentWithCardDto
+			{
                 Amount = payment.Amount,
                 Approved = payment.Approved,
                 Currency = payment.Currency,
@@ -53,7 +102,7 @@ namespace ReGeneration.PaymentGateway.Api.Application.Payments.Extensions
 				Currency = createPaymentRequest.Currency
 			};
 
-			if (createPaymentRequest.Source != null)
+			if (createPaymentRequest.Source is not null)
 			{
 				createPaymentOptions.Source = new PaymentRequestSource
 				{

@@ -1,6 +1,6 @@
 ﻿namespace ReGeneration.PaymentGateway.Api.Application.Payments.Dtos
 {
-    public class PaymentDto
+    public class PaymentBaseDto
     {
         public Guid Id { get; set; }
 
@@ -11,7 +11,5 @@
         public bool Approved { get; set; }
 
         public string Status { get; set; } = default!;
-
-        public CardDto Source { get; set; } = default!;
     }
 }
