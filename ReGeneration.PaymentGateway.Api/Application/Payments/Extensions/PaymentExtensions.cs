@@ -91,7 +91,7 @@ namespace ReGeneration.PaymentGateway.Api.Application.Payments.Extensions
 
 		public static CreatePaymentOptions ToCreatePaymentOptions(this CreatePaymentRequest createPaymentRequest)
 		{
-			if (createPaymentRequest == null)
+			if (createPaymentRequest is null)
 			{
 				return new CreatePaymentOptions();
 			}

@@ -56,7 +56,8 @@ namespace ReGeneration.PaymentGateway.Api.Application.Services
 			var existingCard = await FetchCardFromDbIfExistsAndValidateAgainstNewPaymentRequestSourceDetailsAsync(createPaymentOptions.Source, cancellationToken);
 
 			Guid cardIdToUseForPayment;
-			if (existingCard != null)
+
+			if (existingCard is not null)
 			{
 				cardIdToUseForPayment = existingCard.Id;
 			}
@@ -94,7 +95,7 @@ namespace ReGeneration.PaymentGateway.Api.Application.Services
 				.AsNoTracking()
 				.SingleOrDefaultAsync(p => p.Id == paymentId, cancellationToken);
 
-			if (payment == null)
+			if (payment is null)
 			{
 				throw new NotFoundException(nameof(Payment), paymentId);
 			}
@@ -121,7 +122,7 @@ namespace ReGeneration.PaymentGateway.Api.Application.Services
 				.Include(p => p.Card)
 				.SingleOrDefaultAsync(p => p.Id == paymentId, cancellationToken);
 
-			if (payment == null)
+			if (payment is null)
 			{
 				throw new NotFoundException(nameof(Payment), paymentId);
 			}
@@ -140,7 +141,7 @@ namespace ReGeneration.PaymentGateway.Api.Application.Services
 				.Include(p => p.Payments)
 				.SingleOrDefaultAsync(p => p.Id == cardId, cancellationToken);
 
-			if (card == null)
+			if (card is null)
 			{
 				throw new NotFoundException(nameof(Card), cardId);
 			}
@@ -155,7 +156,7 @@ namespace ReGeneration.PaymentGateway.Api.Application.Services
 		{
 			var existingCardFromDb = await _applicationDbContext.Cards.SingleOrDefaultAsync(c => c.CardNumber == paymentRequestSource.Number, cancellationToken);
 
-			if (existingCardFromDb == null)
+			if (existingCardFromDb is null)
 			{
 				return null;
 			}
