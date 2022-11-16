@@ -12,7 +12,7 @@ using ReGeneration.PaymentGateway.Api.Persistence;
 namespace ReGeneration.PaymentGateway.Api.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221116181217_InitialMigration")]
+    [Migration("20221116204836_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace ReGeneration.PaymentGateway.Api.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ReGeneration.PaymentGateway.Api.Entities.Card", b =>
+            modelBuilder.Entity("ReGeneration.PaymentGateway.Api.Domain.Card", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -52,7 +52,7 @@ namespace ReGeneration.PaymentGateway.Api.Persistence.Migrations
                     b.ToTable("Card", (string)null);
                 });
 
-            modelBuilder.Entity("ReGeneration.PaymentGateway.Api.Entities.Payment", b =>
+            modelBuilder.Entity("ReGeneration.PaymentGateway.Api.Domain.Payment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -84,9 +84,9 @@ namespace ReGeneration.PaymentGateway.Api.Persistence.Migrations
                     b.ToTable("Payment", (string)null);
                 });
 
-            modelBuilder.Entity("ReGeneration.PaymentGateway.Api.Entities.Payment", b =>
+            modelBuilder.Entity("ReGeneration.PaymentGateway.Api.Domain.Payment", b =>
                 {
-                    b.HasOne("ReGeneration.PaymentGateway.Api.Entities.Card", "Card")
+                    b.HasOne("ReGeneration.PaymentGateway.Api.Domain.Card", "Card")
                         .WithMany("Payments")
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -95,7 +95,7 @@ namespace ReGeneration.PaymentGateway.Api.Persistence.Migrations
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("ReGeneration.PaymentGateway.Api.Entities.Card", b =>
+            modelBuilder.Entity("ReGeneration.PaymentGateway.Api.Domain.Card", b =>
                 {
                     b.Navigation("Payments");
                 });
