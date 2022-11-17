@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ReGeneration.PaymentGateway.Api.Application.Common.Interfaces;
 
 namespace ReGeneration.PaymentGateway.Api.Controllers
